@@ -103,7 +103,7 @@ def bewteen_subject():
     df_noCon = import_no_content_prop()
     
     output_btw = pd.concat([df_counts, df_sims, df_semSims, df_w2vSims, df_noCon], axis=1, join_axes=[df_counts.index])
-    output_btw.to_csv('between_subject_test.csv')
+    output_btw.to_csv('between_subject.csv')
 
 ################### within subject calculation #################
 def within_subject():
