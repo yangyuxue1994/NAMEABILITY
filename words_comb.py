@@ -97,7 +97,7 @@ def bewteen_subject():
     df_counts = pd.DataFrame.from_dict(counts, orient='index')
     df_counts.columns = ["numWords","numNouns", "numAdj","numAdv","numNumbers"]
     df_sims = pd.DataFrame.from_dict(sims, orient='index')
-    df_sims.columns = ["wordMatch", "semanticSim"]
+    df_sims.columns = ["simRatio", "wordMatch"]
     df_semSims = import_semantic_sim()
     df_w2vSims = import_w2v_similarity()
     df_noCon = import_no_content_prop()
