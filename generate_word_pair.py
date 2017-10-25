@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 import sys
-from gensim.models import word2vec
+#from gensim.models import word2vec
 import nltk
+#nltk.download('punkt')
 from nltk.corpus import stopwords
 from itertools import combinations
 
@@ -27,15 +28,35 @@ def get_pair():
         w_pair[curProb] = word_pairs
         ww[curProb] = word_pairs_expand
 
+    export_word_tuples = False
+    export_word = False
+    export_sentence = True
 
     output = pd.DataFrame.from_dict(ww, orient = 'index').T
-    output.to_csv('word_pairs_tuples.csv',index=False)
+
+    # export tuple pairs
+    if export_word_tuples:
+        print ('in this word_tuple segment!')
+        output.to_csv('word_pairs_tuples.csv',index=False)
 
     # export non-tuple pairs
-    cols = ww.keys()
-    d = {k: pd.DataFrame(v, columns=['word1','word2']) for k,v in ww.items()}
-    df = pd.concat(d, axis=1)
-    df.to_csv('word_pairs.csv',index=False)
+    if export_word:
+        print ('in this word segment!')
+        cols = ww.keys()
+        d = {k: pd.DataFrame(v, columns=['word1','word2']) for k,v in ww.items()}
+        df = pd.concat(d, axis=1)
+        df.to_csv('word_pairs.csv',index=False)
+
+    if export_sentence:
+        print ('in this sentence segment!')
+        output = pd.DataFrame.from_dict(ww, orient = 'index').T
+        output.to_csv('word_pairs_tuples.csv',index=False)
+
+        
+        s_cols = s_pair.keys()
+        s_d = {k: pd.DataFrame(v, columns=['s1','s2']) for k,v in s_pair.items()}
+        s_df = pd.concat(s_d, axis=1)
+        s_df.to_csv('sentence_pairs.csv',index=False)
 
     return output
 
