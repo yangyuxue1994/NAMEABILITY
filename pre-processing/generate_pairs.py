@@ -7,8 +7,8 @@ import nltk
 from nltk.corpus import stopwords
 from itertools import combinations
 
-def get_pair():
-    d=pd.read_csv('clean_output_trial.csv', header=0)
+def get_pair(file):
+    d=pd.read_csv(file, header=0)
     d.applymap(str)
     problems = d.columns.values.tolist()
 
@@ -28,36 +28,37 @@ def get_pair():
         w_pair[curProb] = word_pairs
         ww[curProb] = word_pairs_expand
 
+    # manipulate particular output you want
     export_word_tuples = False
-    export_word = False
-    export_sentence = True
-
-    output = pd.DataFrame.from_dict(ww, orient = 'index').T
+    export_word = True
+    export_sentence = False
 
     # export tuple pairs
     if export_word_tuples:
-        print ('in this word_tuple segment!')
+        print ('export  word_tuple!')
         output.to_csv('word_pairs_tuples.csv',index=False)
 
     # export non-tuple pairs
     if export_word:
-        print ('in this word segment!')
+        print ('export word pairs!')
         cols = ww.keys()
         d = {k: pd.DataFrame(v, columns=['word1','word2']) for k,v in ww.items()}
         df = pd.concat(d, axis=1)
-        df.to_csv('word_pairs.csv',index=False)
+        df.to_csv('../output/word_pairs.csv',index=False)
 
     if export_sentence:
-        print ('in this sentence segment!')
+        print ('export sentence pairs!')
         output = pd.DataFrame.from_dict(ww, orient = 'index').T
-        output.to_csv('word_pairs_tuples.csv',index=False)
+        output.to_csv('../output/word_pairs_tuples.csv',index=False)
 
         
         s_cols = s_pair.keys()
         s_d = {k: pd.DataFrame(v, columns=['s1','s2']) for k,v in s_pair.items()}
         s_df = pd.concat(s_d, axis=1)
-        s_df.to_csv('sentence_pairs.csv',index=False)
+        s_df.to_csv('../output/sentence_pairs.csv',index=False)
 
+    # only return word pairs for later use
+    output = pd.DataFrame.from_dict(ww, orient = 'index').T
     return output
 
 def get_word_pair(sentence_pair):
@@ -69,7 +70,10 @@ def get_word_pair(sentence_pair):
 
     return [(w1, w2) for w1 in words1 for w2 in words2]
 
-get_pair()
+
+####################### main #######################
+clean_trial_path = '../output/clean_output_trial.csv'
+get_pair(clean_trial_path)
 
 
 

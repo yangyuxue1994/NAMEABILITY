@@ -2,12 +2,13 @@ import pandas as pd
 import numpy as np
 import string
 import csv
+import nltk
 from collections import Counter
 from nltk.corpus import stopwords
 
 
 """
-For Raw Data Version
+For Raw Data Version: 'gvi_-_nameability_-_different_-_uw.csv'
 """
 
 """
@@ -64,28 +65,18 @@ def drop_stopwords(res_str):    # input: str;   output: str, remove punctuation
             res_str_clean.append(word)
     return ' '.join(res_str_clean)
 
-"""
-    count the number of no_content responses for each trial
-    generate a file 'no_content_prop.csv'
-    return a df with two columns: [trial_name, averageNoContent]
-"""
-def count_no_content(df):
-    #convert no_content column to int type
-    df['no_content'] = pd.to_numeric(df['no_content'], errors='coerce')
-    df_no_content1 = df.groupby(['subq_label'])['no_content'].sum()
-    df_no_content2 = df.groupby(['subq_label'])['no_content'].mean()
-    df_no_content = pd.concat([df_no_content1, df_no_content2], axis=1)
-    df_no_content.to_csv('no_content_prop.csv', header=['numNoContent', 'aveNoContent'])
-    return df_no_content
 
-# READ DATA -> DICT
-def convert_dicts(file):
-    cols = ["subq_label", "response", "subjCode", "no_content"]
-    d=pd.read_csv(file, header=0, usecols = cols)
+'''
+    This function read relevant data into a dictonary
+    @ param: pre-processed data
+    @ return: a list of dictonary [ {participants:responses}, {trials: responses} ]
+    '''
+def convert_dicts(raw_data_file):
+    cols = ["subq_label", "response", "subjCode"]
+    d=pd.read_csv(raw_data_file, header=0, usecols = cols)
     d.applymap(str)
     dataList = d.values.tolist()    #each [trial, reponse, id, no_content]
-    
-    count_no_content(d)
+
     clean_data = drop_data(dataList)
    
     pp_reponse = {}
@@ -110,32 +101,68 @@ def convert_dicts(file):
 
     return [pp_reponse, trial_response]
 
-def import_dics():
-    file = 'gvi_-_nameability_-_different_-_uw.csv' # default raw data name
-    dics = convert_dicts(file)
+'''
+    This function export the csv file of two dictionaries: {participants:responses}, {trials: responses}
+    @ return: 
+        {participants:responses} -> clean_output_id.csv
+        {trials: responses} -> clean_output_trial.csv
+    '''
+def export_clean_data(raw_data_file, output_cleanID, output_cleanTrial):
+    dics = convert_dicts(raw_data_file)
     dic_id = dics[0]
     dic_trial = dics[1]
     
     outputID = pd.DataFrame.from_dict(dic_id, orient='index', dtype=None).T
     outputTrial = pd.DataFrame.from_dict(dic_trial, orient='index', dtype=None).T
     
-    outputID.to_csv("clean_output_id.csv",index=False)   # each col is a ID
-    outputTrial.to_csv("clean_output_trial.csv", index=False)    # each col is a trial
+    outputID.to_csv(output_cleanID,index=False)   # each col is a ID
+    outputTrial.to_csv(output_cleanTrial, index=False)    # each col is a trial
 
-
-# mark reponse: 0-has content; 1-no content
-def label_no_content():
-    file = 'gvi_-_nameability_-_different_-_uw.csv' # default raw data name
-    df = pd.read_csv(file, header=0)
-    no_words = 'sure'
-    df['no_content'] = df.apply(lambda row: int(no_words in row['response']), axis=1)
+############## deal with no-content words ##############
+'''
+    This function marks meaningless reponses: 0- has content; 1- no content
+    and export csv file
+    @return: gvi_-_nameability_-_different_-_uw_mark.csv
+    '''
+def label_no_content(raw_data_file, meaningless_word):
+    df = pd.read_csv(raw_data_file, header=0)
+    df['no_content'] = df.apply(lambda row: int(meaningless_word in row['response']), axis=1)
     df.groupby('response')
-    df.to_csv('gvi_-_nameability_-_different_-_uw_mark.csv', index=False)
+    #df.to_csv('gvi_-_nameability_-_different_-_uw_mark.csv', index=False)
+    return df
+
+'''
+    This function counts the number of no_content responses for each trial
+    generate a file 'no_content_prop.csv'
+    return a df with two columns: [trial_name, averageNoContent]
+    '''
+def count_no_content(df, output_count_no_content):
+    #convert no_content column to int type
+    df['no_content'] = pd.to_numeric(df['no_content'], errors='coerce')
+    df_no_content1 = df.groupby(['subq_label'])['no_content'].sum()
+    df_no_content2 = df.groupby(['subq_label'])['no_content'].mean()
+    df_no_content = pd.concat([df_no_content1, df_no_content2], axis=1)
+    # export to csv file
+    df_no_content.to_csv(output_count_no_content, header=['numNoContent', 'aveNoContent'])
+    return df_no_content
 
 
-### main
-#label_no_content()
-import_dics()
+
+##################### main #####################
+'''
+    set input path and output path
+    '''
+raw_file = '../gvi_-_nameability_-_different_-_uw.csv'
+output_count_no_content = '../output/no_content_prop.csv'
+output_cleanID = '../output/clean_output_id.csv'
+output_cleanTrial = '../output/clean_output_trial.csv'
+meaningless_word = 'sure'
+
+# export 'no_content_proportion' to csv file
+count_no_content(label_no_content(raw_file, meaningless_word), output_count_no_content)
+
+# export 'clean_output_id' & 'clean_output_trial'
+export_clean_data(raw_file, output_cleanID, output_cleanTrial)
 
 
 

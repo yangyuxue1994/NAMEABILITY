@@ -1,7 +1,15 @@
 *** doc ***
 
+Pre-Processing Raw Data:
 STEP1:
-run read_data.py:
+run read_data.py: to 1) drop unimportant words 2) label no_content response
+@input:  ‘gvi_-_nameability_-_different_-_uw.csv’
+@output: ‘gvi_-_nameability_-_different_-_uw_mark.csv’
+	 ‘no_content_prop.csv’
+	 ‘clean_output_id.csv’
+	 ‘clean_output_trial.csv’
+
+
 	- drop_data() drop incomplete data and not sure data and stop words
 	- drop_stopwords() return response_string to ‘no stop word’ response_string
 	- convert_dicts() read data, convert to dict format: [pp_response, trial_response]

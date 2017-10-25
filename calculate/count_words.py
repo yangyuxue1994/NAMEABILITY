@@ -64,21 +64,27 @@ def numWordMatch(l1,l2):
 '''
     This function import calculated semantic similarity and no_content_prop, and combine with current df
     '''
-def import_semantic_sim():
-    df = pd.read_csv('semantic_similarity_output.csv', header=0, index_col=0)
+def import_semantic_sim(trial_files):
+    df = pd.read_csv(trial_files[1], header=0, index_col=0)
     return df
 
-def import_no_content_prop():
-    df = pd.read_csv('no_content_prop.csv', header=0, index_col=0)
+def import_w2v_similarity(trial_files):
+    df = pd.read_csv(trial_files[2], header=0, index_col=0)
     return df
 
-def import_w2v_similarity():
-    df = pd.read_csv('w2vSim.csv', header=0, index_col=0)
+def import_sif_similarity(trial_files):
+    df = pd.read_csv(trial_files[3], header=0, index_col=0)
     return df
+
+def import_no_content_prop(trial_files):
+    df = pd.read_csv(trial_files[4], header=0, index_col=0)
+    return df
+
+
 
 ################### between subject calculation #################
-def bewteen_subject():
-    df = read_preprocessed_file('clean_output_trial.csv')  # read data
+def bewteen_subject(trial_files):
+    df = read_preprocessed_file(trial_files[0])  # read clean trial data
     trial_names = list(df)
 
     ## calculate num for each column
@@ -98,16 +104,19 @@ def bewteen_subject():
     df_counts.columns = ["numWords","numNouns", "numAdj","numAdv","numNumbers"]
     df_sims = pd.DataFrame.from_dict(sims, orient='index')
     df_sims.columns = ["simRatio", "wordMatch"]
-    df_semSims = import_semantic_sim()
-    df_w2vSims = import_w2v_similarity()
-    df_noCon = import_no_content_prop()
+
+    # import relevant data
+    df_semSims = import_semantic_sim(trial_files)
+    df_w2vSims = import_w2v_similarity(trial_files)
+    df_sifSims = import_sif_similarity(trial_files)
+    df_noCon = import_no_content_prop(trial_files)
     
-    output_btw = pd.concat([df_counts, df_sims, df_semSims, df_w2vSims, df_noCon], axis=1, join_axes=[df_counts.index])
-    output_btw.to_csv('between_subject.csv')
+    output_btw = pd.concat([df_counts, df_sims, df_semSims, df_w2vSims, df_sifSims, df_noCon], axis=1, join_axes=[df_counts.index])
+    output_btw.to_csv('../output/between_subject.csv')
 
 ################### within subject calculation #################
-def within_subject():
-    df = read_preprocessed_file('clean_output_id.csv')  # read data
+def within_subject(file):
+    df = read_preprocessed_file(file)  # read data
     pp_ids = list(df)
 
     ## calculate num for each column
@@ -121,8 +130,19 @@ def within_subject():
 
     output_wint = pd.DataFrame.from_dict(counts, orient='index')
     output_wint.columns = ["numWords","numNouns", "numAdj","numAdv","numNumbers"]
-    output_wint.to_csv('within_subject.csv')
+    output_wint.to_csv('../output/within_subject.csv')
 
 ########## main ############
-bewteen_subject()
-within_subject()
+'''
+    set input paths
+    '''
+id_file = '../output/clean_output_id.csv'
+trial_files = ['../output/clean_output_trial.csv',
+               '../output/semantic_similarity_output.csv',
+               '../output/w2vSim.csv',
+               '../output/sifSim.csv',
+               '../output/no_content_prop.csv']
+
+# export outputs
+bewteen_subject(trial_files)
+within_subject(id_file)
