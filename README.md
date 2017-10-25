@@ -7,13 +7,13 @@ not finished yet
 
 
 
-<h2>STEP1:</h2>
+<h2>STEP1: pre-processing raw data</h2>
 run read_data.py:
 	- drop_data() drop incomplete data and not sure data and stop words
 	- drop_stopwords() return response_string to ‘no stop word’ response_string
 	- convert_dicts() read data, convert to dict format: [pp_response, trial_response]
-	- import_dics() read in data, and export to ‘clean_output’
-	- label_no_content() 
+	- import_dics() read in data, and export to ‘clean_output_id.csv’ and 'clean_output_trial.csv'
+	- label_no_content() label the 'meaningless' responses as 1, 'meaningful' responses as 0
 main: 
 import_dics()
 label_no_content()
@@ -25,22 +25,24 @@ output: 4 files:
 
 <h2>STEP2: calculate semantic similarity</h2>
 run semantic_similarity_aw.py:
-1. input: clean_output_trial.csv -> semantic_similarity_output_test.csv
+1. input: clean_output_trial.csv -> output: semantic_similarity_output.csv
 
 <h2>STEP3: calculate w2v similarity:</h2>
-1. generate word_pairs
-	input: clean_output_trial.csv -> word_pairs.csv
+1. run generate_word_pair.py: pre-processing data to get pairwise word pairs
+	input: clean_output_trial.csv -> output: word_pairs.csv
 
-2. calculate w2v 
+2. calculate w2v (running in terminal, not directly from script)
 	input: word_pairs 
-	-> w2vSim.csv [trialName, average sim]
+	-> w2vSim.csv [trialName, average similarity]
 	-> (*)w2v_similarity_words.csv [all word pairs and each w2v similarity]
 
-<h2>STEP4:</h2>
+<h2>STEP4: count words. by trial OR by subject</h2>
 run words_comb.py:
+	input: clean_output_id.csv -> output: within_subject.csv
+	input: clean_output_trial.csv -> output: between_subject.csv
 
 
-<h2>All Output Files</h2>
+<h3>All Output Files</h3>
 1. input: clean_output_trial -> between_subject
 2. input: clean_output_id -> within_subject
 3. input: semantic_similarity_output 
