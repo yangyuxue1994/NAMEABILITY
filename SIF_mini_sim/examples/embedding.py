@@ -79,15 +79,15 @@ params = params.params()
 params.rmpc = rmpc
 
 #################################### main ####################################
-inputFile = 'clean_output_trial.csv'
+inputFile = '../../output/clean_output_trial.csv'
 
 sentence_dict = extract_sentences(inputFile)
 SIF_ave_similarity = get_ave_sims(sentence_dict, params)
 
 output = pd.DataFrame.from_dict(SIF_ave_similarity, orient='index')
 print output
-output.columns = ["sifSimilarity"]
-output.to_csv('sifSim.csv')
+output.columns = ["SIFSimilarity"]
+output.to_csv('../../output/SIF_similarity.csv')
 
 
 

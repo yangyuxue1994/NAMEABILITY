@@ -283,7 +283,7 @@ stop = stopwords.words('english')
 """
     For DIFF version
     """
-d=pd.read_csv("clean_output_trial.csv",header=0)
+d=pd.read_csv('../output/clean_output_trial.csv',header=0)
 d.applymap(str)
 problems = d.columns.values.tolist()
 
@@ -307,9 +307,12 @@ for curProb in problems:
     semanticSim = []
     ## drop NAN
     cur_df = d[curProb].dropna(axis=0, how='any')
+#    print cur_df
     pairs = combinations(cur_df,2)
     for curPair in pairs:
     #for curPair in pairs:
+        if 'nan' in curPair:
+            print 'NAN in current pair'
         curSim = similarity(curPair[0], curPair[1], False)
         if np.isnan(curSim):
             curSim = 1.0 # function returns nan for single exact word matches, manually changing to 1.0

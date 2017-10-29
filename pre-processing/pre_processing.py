@@ -34,8 +34,8 @@ def drop_data(dataList):
         #print ('test1: ' + str(type(data[2])))
         if (type(data[2]) is float) & (data not in delete):
             delete.append(data)
-        if ('sure' in data[1]) & (data not in delete):
-            delete.append(data)
+#        if ('sure' in data[1]) & (data not in delete):
+#            delete.append(data)
         if (data[2] in delete_id) & (data not in delete):
             delete.append(data)
         
@@ -157,6 +157,7 @@ output_count_no_content = '../output/no_content_prop.csv'
 output_cleanID = '../output/clean_output_id.csv'
 output_cleanTrial = '../output/clean_output_trial.csv'
 meaningless_word = 'sure'
+
 
 # export 'no_content_proportion' to csv file
 count_no_content(label_no_content(raw_file, meaningless_word), output_count_no_content)

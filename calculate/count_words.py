@@ -20,32 +20,38 @@ def read_preprocessed_file(f):
     return d
 
 def count_words_ave(col_list, trial_name):
-    
     words = []
     nouns = []
     adj = []
     adv = []
     numbers = []
     for curAnswer in col_list:
-        words.append(len(curAnswer.split()))
-        text = TextBlob(curAnswer)
-        count = Counter([j for i,j in text.tags])
-        nouns.append((count['NN']+count['NNS']+count['NNPS']+count['NNPS']))
-        adj.append(count['JJ']+count['JJR']+count['JJS'])
-        adv.append(count['RB']+count['RBR']+count['RBS']+count['RP'])
-        numbers.append(count['CD'])
+        if str(curAnswer) != 'nan': # skip 'nan' response
+#            print trial_name, curAnswer
+            words.append(len(curAnswer.split()))
+            text = TextBlob(curAnswer)
+            count = Counter([j for i,j in text.tags])
+            nouns.append((count['NN']+count['NNS']+count['NNPS']+count['NNPS']))
+            adj.append(count['JJ']+count['JJR']+count['JJS'])
+            adv.append(count['RB']+count['RBR']+count['RBS']+count['RP'])
+            numbers.append(count['CD'])
 
     numWordsAve = sum(words)/ float(len(col_list))
     numNounsAve = sum(nouns)/ float(len(col_list))
     numAdjAve = sum(adj)/ float(len(col_list))
     numAdvAve = sum(adv)/ float(len(col_list))
     numNumbersAve = sum(numbers)/ float(len(col_list))
+    
+    # total number of adj, total num of responses(42), average number of adj per response
+    # print trial_name, numWordsAve
+
     return {trial_name: [numWordsAve,numNounsAve, numAdjAve,numAdvAve,numNumbersAve]}
 
 def get_similarity(col_list, trial_name):
     col = []
     for i in col_list:
-        col.append(i.split())
+        if 'nan' not in i:  # skip 'nan'
+            col.append(i.split())
     sim = []
     numMatch = []
     pairs = combinations(col,2)
@@ -55,6 +61,8 @@ def get_similarity(col_list, trial_name):
         numMatch.append(numWordMatch(curPair[0],curPair[1]))
     simAve = sum(sim)/ float(len(sim))
     numMatchAve = sum(numMatch)/ float(len(numMatch))
+
+    print trial_name, simAve, numMatchAve
     return {trial_name: [simAve, numMatchAve]}
 
 # helper function for get_similarity
@@ -86,9 +94,8 @@ def import_no_content_prop(trial_files):
 def bewteen_subject(trial_files):
     df = read_preprocessed_file(trial_files[0])  # read clean trial data
     trial_names = list(df)
-
-    ## calculate num for each column
     cols = np.transpose( df.values.tolist() )
+
     counts = {}
     sims = {}
     for i in range(len(cols)):
@@ -98,7 +105,7 @@ def bewteen_subject(trial_files):
         #print cur_sims
         counts = dict(counts.items() + cur_counts.items())  # add
         sims = dict(sims.items() + cur_sims.items())
-    
+
     # combine multiple dataframes
     df_counts = pd.DataFrame.from_dict(counts, orient='index')
     df_counts.columns = ["numWords","numNouns", "numAdj","numAdv","numNumbers"]
@@ -136,13 +143,15 @@ def within_subject(file):
 '''
     set input paths
     '''
+
+print 'drop version'
 id_file = '../output/clean_output_id.csv'
 trial_files = ['../output/clean_output_trial.csv',
                '../output/semantic_similarity_output.csv',
-               '../output/w2vSim.csv',
+               '../output/w2v_similarity.csv',
                '../output/sifSim.csv',
                '../output/no_content_prop.csv']
-
+raw = '../gvi_-_nameability_-_different_-_uw.csv'
 # export outputs
 bewteen_subject(trial_files)
 within_subject(id_file)
