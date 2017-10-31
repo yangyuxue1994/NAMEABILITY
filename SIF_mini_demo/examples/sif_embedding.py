@@ -115,5 +115,5 @@ print 'start export'
 
 output = pd.DataFrame.from_dict(SIF_ave_similarity, orient='index')
 output.columns = ["SIFSimilarity"]
-output.to_csv('../../output/SIF_similarity.csv')
+output.to_csv('SIF_similarity_1000000.csv')
 
