@@ -16,7 +16,6 @@ def get_weighted_average(We, x, w):
         emb[i,:] = w[i,:].dot(We[x[i,:],:]) / np.count_nonzero(w[i,:])
     return emb
 
-
 def compute_pc(X,npc=1):
     """
     Compute the principal components. DO NOT MAKE THE DATA ZERO MEAN!

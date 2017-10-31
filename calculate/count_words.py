@@ -62,7 +62,7 @@ def get_similarity(col_list, trial_name):
     simAve = sum(sim)/ float(len(sim))
     numMatchAve = sum(numMatch)/ float(len(numMatch))
 
-    print trial_name, simAve, numMatchAve
+#    print trial_name, simAve, numMatchAve
     return {trial_name: [simAve, numMatchAve]}
 
 # helper function for get_similarity
@@ -83,6 +83,7 @@ def import_w2v_similarity(trial_files):
 def import_sif_similarity(trial_files):
     df = pd.read_csv(trial_files[3], header=0, index_col=0)
     return df
+
 
 def import_no_content_prop(trial_files):
     df = pd.read_csv(trial_files[4], header=0, index_col=0)
@@ -149,8 +150,9 @@ id_file = '../output/clean_output_id.csv'
 trial_files = ['../output/clean_output_trial.csv',
                '../output/semantic_similarity_output.csv',
                '../output/w2v_similarity.csv',
-               '../output/sifSim.csv',
-               '../output/no_content_prop.csv']
+               '../output/SIF_similarity.csv',
+               '../output/no_content_prop.csv'
+               ]
 raw = '../gvi_-_nameability_-_different_-_uw.csv'
 # export outputs
 bewteen_subject(trial_files)
