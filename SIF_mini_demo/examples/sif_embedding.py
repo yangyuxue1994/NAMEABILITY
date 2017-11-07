@@ -45,18 +45,24 @@ def get_embs(sentences, params):
     @param: embedding of a list of sentences
     @return:a list of cos similarity for combinations between any two senetences
     '''
-def get_sif_sims(embedding):
+def get_sif_sims(embedding, s):
     similarity = []
     # a list of combination of embeddings, each one is a tuple, [(emb1, emb2), (emb1, emb3)...]
-    for emb_pair in list(combinations(embedding,2)):
+    allEmbs = list(combinations(embedding,2))
+    for i in range(len(allEmbs)):
+        emb_pair = allEmbs[i]
         cos = 1-get_each_score(emb_pair)
         # print cos
         # This is to skip any negative scores
-        if (cos<=1) & (cos>=0):
+        if (cos<=1) & (cos>=0) | (round(cos)==0):
             similarity.append(cos)
         else:
-            print 'this is a negative score', cos
+            print 'this is an abnormal cos: ', cos, helper(s, i)
     return similarity
+
+# this is testing method for negatives score
+def helper(sentences, i):
+    return list(combinations(sentences,2))[i]
 
 '''
     This function is calculating a similairty between two sentence, based on their embedding vector
@@ -81,13 +87,13 @@ def get_ave_sims(sentence_dict, params):
     for trial,sentences in sentence_dict.items():
         embedding = get_embs(sentences, params)
 #        print 'sentences', sentences
-        cos_similarity = get_sif_sims(embedding)    # get the cos similarity for each pair of sentence
+        cos_similarity = get_sif_sims(embedding, sentences)    # get the cos similarity for each pair of sentence
         SIF_sims[trial] = np.mean(cos_similarity)    # get the average cos similarity for each trial
     return SIF_sims
 
 ####################################  input ####################################
 print 'start main'
-wordfile = '../data/glove.840B.300d.txt' # word vector file, can be downloaded from GloVe website
+wordfile = '../data/newVectors.txt' # word vector file, can be downloaded from GloVe website
 weightfile = '../auxiliary_data/enwiki_vocab_min200.txt' # each line is a word and its frequency
 weightpara = 1e-3 # the parameter in the SIF weighting scheme, usually in the range [3e-5, 3e-3]
 rmpc = 0 # number of principal components to remove in SIF weighting scheme
@@ -106,7 +112,7 @@ params.rmpc = rmpc
 #score = inn / emb1norm / emb2norm
 
 #################################### main ####################################
-inputFile = '../../output/clean_output_trial.csv'
+inputFile = '../../output/clean_output_trial.csv'   # remove stop words
 
 sentence_dict = extract_sentences(inputFile)
 SIF_ave_similarity = get_ave_sims(sentence_dict, params)
@@ -114,6 +120,6 @@ SIF_ave_similarity = get_ave_sims(sentence_dict, params)
 print 'start export'
 
 output = pd.DataFrame.from_dict(SIF_ave_similarity, orient='index')
-output.columns = ["SIFSimilarity"]
-output.to_csv('SIF_similarity_1000000.csv')
+output.columns = ["SIF_Similarity_onlyNeededVec"]
+output.to_csv('../../output/SIF_similarity.csv')
 
