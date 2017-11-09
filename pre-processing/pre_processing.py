@@ -12,7 +12,10 @@ from collections import Counter
 
 """
 For Raw Data Version: 'gvi_-_nameability_-_different_-_uw.csv'
+Modify for 'GVI__Nameability__Different.csv'
 """
+
+
 
 """
     This function drop everything from raw data, and return a list of modified data
@@ -224,6 +227,28 @@ def count_raw_response(input_rawfile, output):
     return df
 
 
+#################### Pre-Process-Diff-Version ####################
+def preprocess_diff_version(old_file):
+    old_file = 'GVI__Nameability__Different.csv'
+    trialrange = range(46)[3:]
+    trialNames = ['diff(' + str(i) +')' for i in trialrange]
+    trialNames.append('V1')
+    trialNames.remove('diff(17)')   # no diff(17)
+    df = pd.read_csv(old_file, usecols=trialNames)
+    df=df.rename(columns = {'V1':'ResponseID'}).drop(df.index[0])
+    df['subjectNumber']=['%02d' % i for i in range(16)[1:]]
+    # expand
+#    pd.melt(df, id_vars=['A'], value_vars=[''])
+#    df2 = pd.melt(df, id_vars=[''])
+    trialNames.pop()
+    pd.melt(df, id_vars=['ResponseID', 'subjectNumber'], value_vars=trialNames,
+            var_name="Person", value_name="Score")
+
+
+
+
+
+
 ##################### main #####################
 '''
     set input path and output path
@@ -235,17 +260,19 @@ output_cleanTrial = '../output/clean_output_trial.csv'
 output_count_raw = '../output/gvi_-_nameability_-_different_-_uw_count.csv'
 meaningless_word = 'sure'
 
+'''
 #correct_typo(raw_file)
 
 # export 'no_content_proportion' to csv file
 count_no_content(label_no_content(raw_file, meaningless_word), output_count_no_content)
 
-# export 'clean_output_id' & 'clean_output_trial'
-# remove stop words, remove meaningless words
+# export 'clean_output_id' & 'clean_output_trial'(remove stop words, remove meaningless words
 export_clean_data(raw_file, output_cleanID, output_cleanTrial, meaningless_word)
 
 # count each trial-subject conbination and export a file
 count_raw_response(raw_file, output_count_raw)
+'''
+
 
 
 
