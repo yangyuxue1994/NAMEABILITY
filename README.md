@@ -22,7 +22,7 @@ in pre-processing, run:
 
 
 
-####Step2: calculate semantic similarity & word2vector similarity
+#### Step2: calculate semantic similarity & word2vector similarity
 
 in calculate folder, run:
 
@@ -38,7 +38,7 @@ in calculate folder, run:
 
 
 
-####Step3: calculate SIF similarity
+#### Step3: calculate SIF similarity
 
 in SIF_mini_sim folder
 
